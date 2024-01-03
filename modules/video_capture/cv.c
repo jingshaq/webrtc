@@ -38,3 +38,88 @@ int main() {
 
     return 0;
 }
+
+
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+int main() {
+    const int width = 1920;
+    const int height = 1080;
+
+    // 创建Mat对象
+    cv::Mat imageA(height, width, CV_8UC4, bufferA);
+    cv::Mat imageB(height, width, CV_8UC4, bufferB);
+
+    // 转换为灰度图
+    cv::Mat grayA, grayB;
+    cv::cvtColor(imageA, grayA, cv::COLOR_RGBA2GRAY);
+    cv::cvtColor(imageB, grayB, cv::COLOR_RGBA2GRAY);
+
+    // 计算差异图
+    cv::Mat diffImage;
+    cv::absdiff(grayA, grayB, diffImage);
+
+    // 对差异图进行阈值处理
+    cv::Mat thresh;
+    cv::threshold(diffImage, thresh, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    // 寻找轮廓
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(thresh.clone(), contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // 循环遍历每个轮廓，并打印边界框的坐标信息
+    for (int i = 0; i < contours.size(); i++) {
+        cv::Rect boundingBox = cv::boundingRect(contours[i]);
+        // 输出边框的坐标信息
+        std::cout << "x: " << boundingBox.x << ", y: " << boundingBox.y << ", width: " << boundingBox.width << ", height: " << boundingBox.height << std::endl;
+    }
+
+    return 0;
+}
+
+
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+int main() {
+    const int width = 1920;
+    const int height = 1080;
+
+    // 假设bufferA和bufferB是两个大小为width*height*4的缓冲区，包含RGBA数据
+
+    // 创建Mat对象
+    cv::Mat imageA(height, width, CV_8UC4, bufferA);
+    cv::Mat imageB(height, width, CV_8UC4, bufferB);
+
+    // 提取RGB通道，忽略Alpha通道
+    cv::Mat rgbA(imageA, cv::Rect(0, 0, 3, height));
+    cv::Mat rgbB(imageB, cv::Rect(0, 0, 3, height));
+
+    // 转换为灰度图
+    cv::Mat grayA, grayB;
+    cv::cvtColor(rgbA, grayA, cv::COLOR_RGB2GRAY);
+    cv::cvtColor(rgbB, grayB, cv::COLOR_RGB2GRAY);
+
+    // 计算差异图
+    cv::Mat diffImage;
+    cv::absdiff(grayA, grayB, diffImage);
+
+    // 对差异图进行阈值处理
+    cv::Mat thresh;
+    cv::threshold(diffImage, thresh, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    // 寻找轮廓
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(thresh.clone(), contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // 循环遍历每个轮廓，并打印边界框的信息
+    for (int i = 0; i < contours.size(); i++) {
+        cv::Rect boundingBox = cv::boundingRect(contours[i]);
+        // 输出边框的坐标信息
+        std::cout << "x: " << boundingBox.x << ", y: " << boundingBox.y << ", width: " << boundingBox.width << ", height: " << boundingBox.height << std::endl;
+    }
+
+    return 0;
+}
+
