@@ -123,3 +123,22 @@ int main() {
     return 0;
 }
 
+
+for (int i = 0; i < contours.size(); i++) {
+    cv::Rect boundingBox = cv::boundingRect(contours[i]);
+    
+    // 截取边界框指定的区域
+    cv::Mat roi = imageA(boundingBox);
+
+    // 将ROI保存为JPEG文件
+    std::string filename = "roi_" + std::to_string(i) + ".jpg";
+    std::vector<int> compression_params;
+    compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+    compression_params.push_back(95);  // JPEG质量设为95
+    cv::imwrite(filename, roi, compression_params);
+
+    // 输出边框的坐标信息
+    std::cout << "x: " << boundingBox.x << ", y: " << boundingBox.y << ", width: " << boundingBox.width << ", height: " << boundingBox.height << " saved as " << filename << std::endl;
+}
+
+
